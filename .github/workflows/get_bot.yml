@@ -1,0 +1,48 @@
+# This workflow will retrieve the bot schema as a snapshot
+
+name: Get Twilio Bot Schema
+
+on:
+  workflow_dispatch:
+    inputs:
+      name:
+        description: 'Bot Unique Name'
+        required: true
+        default: 'payment-type'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: '12.x'
+      - name: Install twilio cli and autopilot plugin
+        run: |
+          npm install twilio-cli -g
+          twilio plugins:install @dabblelab/plugin-autopilot
+      - name: Get current time
+        uses: 1466587594/get-current-time@v2
+        id: current-time
+        with:
+          format: YYYY-MM-DD-x
+      - name: Import the bot and commit the changes
+        env:
+          TIME: ${{ steps.current-time.outputs.time }}
+          F_TIME: ${{ steps.current-time.outputs.formattedTime }}
+          TWILIO_ACCOUNT_SID: ${{ secrets.TWILIO_ACCOUNT_SID }}
+          TWILIO_API_KEY: ${{ secrets.TWILIO_API_KEY }}
+          TWILIO_API_SECRET: ${{ secrets.TWILIO_API_SECRET }}
+        run: |
+          cd  ./${{ github.event.inputs.name }}/model
+          mkdir -p snapshots
+          cd  ./snapshots
+          twilio autopilot:export --unique-name ${{ github.event.inputs.name }}
+          mv ./${{ github.event.inputs.name }}.json ./schema-$F_TIME.json
+          git config --global user.email ""
+          git config --global user.name "Github Workflow"
+          git add .
+          git commit -m "Schema added: schema-$F_TIME.json"
+          git push

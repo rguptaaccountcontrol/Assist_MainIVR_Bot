@@ -1,0 +1,38 @@
+# This workflow will publish the bot
+
+name: Publish_PROD_BOT Twilio Bot
+
+on:
+  workflow_dispatch:
+    inputs:
+      name:
+        description: 'Bot Unique Name'
+        required: true
+        default: 'GetAccountInfo'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: '12.x'
+      # Runs a single command using the runners shell
+      - name: Install dependencies for the twilio function
+        env:
+         TWILIO_ACCOUNT_SID: ${{ secrets.TWILIO_ACCOUNT_SID_PROD }}
+         TWILIO_API_KEY: ${{ secrets.TWILIO_API_KEY_SID_PROD }}
+         TWILIO_API_SECRET: ${{ secrets.TWILIO_API_SECRET_PROD }}  
+        run: npm install twilio-cli -g && twilio plugins:install @dabblelab/plugin-autopilot && twilio plugins:install @twilio-labs/plugin-serverless
+      - name: look up directory with LS command
+        run: ls -al
+      - name: Deploy Autopilot BOT
+        env:
+         TWILIO_ACCOUNT_SID: ${{ secrets.TWILIO_ACCOUNT_SID_PROD }}
+         TWILIO_API_KEY: ${{ secrets.TWILIO_API_KEY_SID_PROD }}
+         TWILIO_API_SECRET: ${{ secrets.TWILIO_API_SECRET_PROD }} 
+        run: twilio autopilot:update --schema model/schema_PROD.json --unique-name GetAccountInfo
+       
+      
