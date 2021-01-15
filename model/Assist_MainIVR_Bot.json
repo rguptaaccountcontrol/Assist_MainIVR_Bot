@@ -1,0 +1,110 @@
+{
+    "friendlyName" : "",
+    "logQueries" : true,
+    "uniqueName" : "Assist_MainIVR_Bot",
+    "defaults" : {
+        "defaults" : {
+            "assistant_initiation" : "task://greeting",
+            "fallback" : "task://fallback",
+            "collect" : {
+                "validate_on_failure" : "task://collect_fallback"
+            }
+        }
+    },
+    "styleSheet" : {
+        "style_sheet" : {
+            "collect" : {
+                "validate" : {
+                    "on_failure" : {
+                        "repeat_question" : true,
+                        "messages" : [
+                            {
+                                "say" : {
+                                    "speech" : "I did not here you? , "
+                                }
+                            },
+                            { "say" : { "speech" : "" } }
+                        ]
+                    },
+                    "on_success" : { "say" : { "speech" : "" } },
+                    "max_attempts" : 2
+                }
+            },
+            "voice" : {
+                "say_voice" : "Polly.Joanna-Neural"
+            },
+            "name" : ""
+        }
+    },
+    "fieldTypes" : [],
+    "tasks" : [
+        {
+            "uniqueName" : "Collect_task",
+            "actions" : {
+                "actions" : [
+                    {
+                        "collect" : {
+                            "on_complete" : {
+                                "redirect" : "task://fallback"
+                            },
+                            "name" : "collect_comments",
+                            "questions" : [
+                                {
+                                    "question" : "Please say the reason to transfer to an agent, So I can transfer your call appropriately",
+                                    "name" : "comments"
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+            "fields" : [],
+            "samples" : []
+        },
+        {
+            "uniqueName" : "fallback",
+            "actions" : {
+                "actions" : [
+                    {
+                        "say" : "Please wait, While I Transfer your call"
+                    },
+                    { "listen" : false }
+                ]
+            },
+            "fields" : [],
+            "samples" : []
+        },
+        {
+            "uniqueName" : "greeting",
+            "actions" : {
+                "actions" : [
+                    { "say" : "" },
+                    {
+                        "redirect" : "task://collect_Task"
+                    }
+                ]
+            },
+            "fields" : [],
+            "samples" : [
+                {
+                    "language" : "en-US",
+                    "taggedText" : "abcdef"
+                }
+            ]
+        },
+        {
+            "uniqueName" : "collect_fallback",
+            "actions" : {
+                "actions" : [
+                    { "say" : "" },
+                    { "listen" : true }
+                ]
+            },
+            "fields" : [],
+            "samples" : []
+        }
+    ],
+    "modelBuild" : {
+        "uniqueName" : "Assist_MainIVR_Bot_1-10-2020_1.37.14am"
+    }
+}
